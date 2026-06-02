@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nexus — UI Redesign Showcase</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:       #0f0e0d;
+      --paper:     #f5f0e8;
+      --cream:     #ede7d9;
+      --accent:    #c8502a;
+      --gold:      #c9a84c;
+      --muted:     #7a7062;
+      --border:    #d6cfc3;
+      --white:     #ffffff;
+      --dark:      #1a1714;
+      --radius:    4px;
+      --gap:       clamp(1rem, 3vw, 2rem);
+      --section:   clamp(4rem, 8vw, 7rem);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* ─── GRAIN OVERLAY ─────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 9999;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      opacity: .55;
+    }
+
+    /* ─── NAV ────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem clamp(1.5rem, 5vw, 4rem);
+      background: rgba(245,240,232,.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      animation: fadeDown .7s ease both;
+    }
+
+    @keyframes fadeDown {
+      from { opacity:0; transform:translateY(-20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem; font-weight: 900;
+      letter-spacing: -.02em; color: var(--ink);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+    .nav-links a {
+      font-size: .85rem; font-weight: 500; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--muted);
+      text-decoration: none; transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    .nav-cta {
+      background: var(--ink); color: var(--paper);
+      padding: .55rem 1.4rem; border-radius: var(--radius);
+      font-size: .82rem; font-weight: 600; letter-spacing: .05em;
+      text-transform: uppercase; text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+    .nav-cta:hover { background: var(--accent); transform: translateY(-1px); }
+
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .hamburger span { width: 24px; height: 2px; background: var(--ink); transition: all .3s; }
+
+    /* ─── HERO ───────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: grid; place-items: center;
+      padding: calc(var(--section) + 4rem) clamp(1.5rem, 6vw, 5rem) var(--section);
+      position: relative; overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 70% 55% at 75% 40%, rgba(200,80,42,.12) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 40% at 20% 70%, rgba(201,168,76,.1) 0%, transparent 60%);
+    }
+
+    .hero-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: clamp(2rem, 5vw, 5rem); align-items: center;
+      max-width: 1200px; width: 100%; position: relative; z-index: 1;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: .6rem;
+      font-size: .78rem; font-weight: 600; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 1.2rem;
+      animation: fadeUp .7s .2s ease both;
+    }
+    .hero-eyebrow::before {
+      content: ''; width: 28px; height: 2px; background: var(--accent);
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 5.5vw, 5rem);
+      font-weight: 900; line-height: 1.08; letter-spacing: -.02em;
+      margin-bottom: 1.6rem;
+      animation: fadeUp .7s .35s ease both;
+    }
+    h1 em { font-style: italic; color: var(--accent); }
+
+    .hero-desc {
+      font-size: 1.05rem; color: var(--muted); max-width: 48ch;
+      margin-bottom: 2.4rem;
+      animation: fadeUp .7s .5s ease both;
+    }
+
+    .hero-actions {
+      display: flex; flex-wrap: wrap; gap: 1rem;
+      animation: fadeUp .7s .65s ease both;
+    }
+
+    .btn-primary {
+      background: var(--accent); color: var(--white);
+      padding: .85rem 2rem; border-radius: var(--radius);
+      font-size: .9rem; font-weight: 600; letter-spacing: .04em;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: transform .2s, box-shadow .2s, background .2s;
+      box-shadow: 0 4px 20px rgba(200,80,42,.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(200,80,42,.4); }
+
+    .btn-ghost {
+      background: transparent; color: var(--ink);
+      padding: .85rem 2rem; border-radius: var(--radius);
+      font-size: .9rem; font-weight: 500;
+      text-decoration: none; border: 1.5px solid var(--border);
+      cursor: pointer; transition: border-color .2s, color .2s;
+    }
+    .btn-ghost:hover { border-color: var(--ink); }
+
+    /* Hero Visual Card */
+    .hero-visual {
+      position: relative;
+      animation: fadeLeft .9s .4s ease both;
+    }
+
+    @keyframes fadeLeft {
+      from { opacity:0; transform:translateX(40px); }
+      to   { opacity:1; transform:translateX(0); }
+    }
+
+    .mockup-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(15,14,13,.12), 0 4px 12px rgba(15,14,13,.06);
+    }
+
+    .mockup-bar {
+      display: flex; align-items: center; gap: .6rem;
+      padding: .9rem 1.2rem;
+      background: var(--cream); border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+    .url-bar {
+      flex: 1; background: var(--paper);
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: .3rem 1rem; font-family: 'DM Mono', monospace;
+      font-size: .72rem; color: var(--muted); margin-left: .4rem;
+    }
+
+    .mockup-body { padding: 1.4rem; }
+    .mock-nav-strip {
+      display: flex; gap: 1rem; margin-bottom: 1.2rem;
+    }
+    .mock-pill {
+      height: 8px; border-radius: 4px; background: var(--cream);
+    }
+    .mock-hero-block {
+      background: linear-gradient(135deg, var(--cream) 0%, rgba(200,80,42,.08) 100%);
+      border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem;
+    }
+    .mock-tag { width: 60px; height: 6px; background: var(--accent); border-radius: 3px; margin-bottom: .7rem; opacity: .7; }
+    .mock-h { height: 14px; border-radius: 3px; background: var(--ink); margin-bottom: .4rem; opacity: .15; }
+    .mock-p { height: 7px; border-radius: 3px; background: var(--muted); margin-bottom: .3rem; opacity: .2; }
+    .mock-btns { display: flex; gap: .5rem; margin-top: .8rem; }
+    .mock-btn { height: 22px; border-radius: 3px; }
+    .mock-btn-a { width: 80px; background: var(--accent); opacity: .8; }
+    .mock-btn-b { width: 70px; background: var(--border); }
+    .mock-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
+    .mock-card {
+      background: var(--cream); border-radius: 6px; padding: .7rem;
+      border: 1px solid var(--border);
+    }
+    .mock-card-img { height: 40px; border-radius: 4px; background: var(--border); margin-bottom: .5rem; }
+    .mock-card-line { height: 6px; border-radius: 3px; background: var(--muted); opacity: .25; margin-bottom: .25rem; }
+
+    .badge-float {
+      position: absolute; bottom: -18px; right: -18px;
+      background: var(--ink); color: var(--paper);
+      border-radius: 50%; width: 80px; height: 80px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif;
+      box-shadow: 0 8px 24px rgba(15,14,13,.2);
+    }
+    .badge-float .big { font-size: 1.3rem; font-weight: 900; line-height: 1; }
+    .badge-float .small { font-size: .5rem; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+
+    .hero-stats {
+      display: flex; gap: 2rem; margin-top: 2.2rem;
+      animation: fadeUp .7s .8s ease both;
+    }
+    .stat-item { border-left: 2px solid var(--accent); padding-left: .8rem; }
+    .stat-num { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; line-height: 1.1; }
+    .stat-label { font-size: .78rem; color: var(--muted); letter-spacing: .05em; }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ─── SECTION BASE ───────────────────────────────── */
+    section { padding: var(--section) clamp(1.5rem, 6vw, 5rem); }
+
+    .section-label {
+      display: inline-flex; align-items: center; gap: .6rem;
+      font-size: .75rem; font-weight: 600; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .section-label::before { content:''; width:20px; height:1.5px; background:var(--muted); }
+
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-weight: 700; line-height: 1.15; letter-spacing: -.02em;
+      margin-bottom: 1.2rem;
+    }
+
+    /* ─── HEURISTIC EVAL ─────────────────────────────── */
+    #heuristics { background: var(--dark); color: var(--paper); }
+    #heuristics h2 { color: var(--white); }
+    #heuristics .section-label { color: var(--gold); }
+    #heuristics .section-label::before { background: var(--gold); }
+
+    .issues-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.2rem; margin-top: 3rem;
+    }
+
+    .issue-card {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 8px; padding: 1.6rem;
+      position: relative; overflow: hidden;
+      transition: border-color .3s, transform .3s;
+    }
+    .issue-card:hover { border-color: rgba(200,80,42,.5); transform: translateY(-3px); }
+    .issue-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    }
+    .issue-card.sev-high::before { background: #e05252; }
+    .issue-card.sev-med::before  { background: var(--gold); }
+    .issue-card.sev-low::before  { background: #52c0a0; }
+
+    .issue-sev {
+      font-size: .68rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; margin-bottom: .8rem;
+    }
+    .sev-high { color: #e05252; }
+    .sev-med  { color: var(--gold); }
+    .sev-low  { color: #52c0a0; }
+
+    .issue-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem;
+    }
+    .issue-desc { font-size: .88rem; color: rgba(245,240,232,.55); line-height: 1.6; }
+
+    .issue-num {
+      position: absolute; right: 1.2rem; top: 1.2rem;
+      font-family: 'DM Mono', monospace; font-size: .7rem;
+      color: rgba(255,255,255,.2);
+    }
+
+    /* ─── MOODBOARD ──────────────────────────────────── */
+    #moodboard { background: var(--cream); }
+
+    .mood-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: repeat(3, 140px);
+      gap: 1rem; margin-top: 3rem;
+    }
+
+    .mood-block {
+      border-radius: 8px; overflow: hidden;
+      position: relative; display: flex; align-items: flex-end;
+    }
+    .m1 { grid-column: 1/5; grid-row: 1/3; background: var(--ink); }
+    .m2 { grid-column: 5/9; grid-row: 1/2; background: var(--accent); }
+    .m3 { grid-column: 9/13; grid-row: 1/2; background: var(--gold); }
+    .m4 { grid-column: 5/7; grid-row: 2/3; background: var(--cream); border: 1px solid var(--border); }
+    .m5 { grid-column: 7/9; grid-row: 2/3; background: #3d6b60; }
+    .m6 { grid-column: 9/13; grid-row: 2/3; background: #e8ddd0; border: 1px solid var(--border); }
+    .m7 { grid-column: 1/4; grid-row: 3/4; background: var(--accent); opacity: .25; }
+    .m8 { grid-column: 4/7; grid-row: 3/4; background: var(--dark); }
+    .m9 { grid-column: 7/10; grid-row: 3/4; background: var(--gold); opacity: .6; }
+    .m10{ grid-column: 10/13; grid-row: 3/4; background: var(--paper); border:1px solid var(--border); }
+
+    .mood-label {
+      padding: .6rem .8rem; font-size: .7rem; font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase;
+      background: rgba(0,0,0,.35); color: #fff; width: 100%;
+    }
+    .mood-label-light { background: rgba(245,240,232,.8); color: var(--ink); }
+    .mood-type {
+      padding: 1.2rem;
+      font-family: 'Playfair Display', serif;
+      line-height: 1.2;
+    }
+
+    /* ─── STYLE GUIDE ────────────────────────────────── */
+    #styleguide {}
+
+    .sg-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem; margin-top: 3rem;
+    }
+
+    .sg-block {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+    }
+
+    .sg-block-header {
+      background: var(--cream); padding: .9rem 1.3rem;
+      font-size: .75rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sg-block-body { padding: 1.5rem; }
+
+    /* Color swatches */
+    .swatches { display: flex; flex-wrap: wrap; gap: .6rem; }
+    .swatch {
+      flex: 1; min-width: 70px; border-radius: 6px; overflow: hidden;
+      border: 1px solid rgba(0,0,0,.08);
+    }
+    .swatch-color { height: 60px; }
+    .swatch-info { padding: .5rem .6rem; background: var(--white); }
+    .swatch-name { font-size: .72rem; font-weight: 600; }
+    .swatch-hex  { font-family: 'DM Mono', monospace; font-size: .65rem; color: var(--muted); }
+
+    /* Typography specimen */
+    .type-row { padding: .8rem 0; border-bottom: 1px solid var(--border); }
+    .type-row:last-child { border: none; padding-bottom: 0; }
+    .type-specimen { margin-bottom: .2rem; }
+    .type-meta { font-size: .7rem; font-family: 'DM Mono', monospace; color: var(--muted); }
+
+    /* Spacing */
+    .spacing-row { display: flex; align-items: center; gap: 1rem; padding: .5rem 0; }
+    .sp-bar { background: var(--accent); height: 6px; border-radius: 3px; opacity: .7; }
+    .sp-label { font-family: 'DM Mono', monospace; font-size: .72rem; color: var(--muted); white-space: nowrap; }
+
+    /* Components */
+    .comp-row { padding: .8rem 0; border-bottom: 1px solid var(--border); }
+    .comp-row:last-child { border: none; }
+    .comp-label { font-size: .7rem; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-bottom: .5rem; }
+
+    /* ─── MOCKUP SHOWCASE ────────────────────────────── */
+    #mockups { background: var(--dark); color: var(--white); }
+    #mockups h2 { color: var(--white); }
+    #mockups .section-label { color: var(--gold); }
+    #mockups .section-label::before { background: var(--gold); }
+
+    .mockup-tabs {
+      display: flex; gap: 0; margin: 2.5rem 0 2rem;
+      border: 1px solid rgba(255,255,255,.12); border-radius: 8px;
+      overflow: hidden; width: fit-content;
+    }
+    .tab-btn {
+      padding: .65rem 1.4rem; background: transparent;
+      border: none; cursor: pointer; color: rgba(255,255,255,.45);
+      font-size: .82rem; font-weight: 500; letter-spacing: .05em;
+      transition: all .2s; font-family: 'DM Sans', sans-serif;
+    }
+    .tab-btn.active { background: var(--accent); color: var(--white); }
+    .tab-btn:hover:not(.active) { background: rgba(255,255,255,.06); color: rgba(255,255,255,.8); }
+
+    .mockup-frame {
+      display: none;
+      border-radius: 10px; overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,.4);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .mockup-frame.active { display: block; }
+
+    /* Desktop mockup */
+    .desk-chrome {
+      background: #2a2725; padding: .8rem 1rem;
+      display: flex; align-items: center; gap: .7rem;
+    }
+    .desk-dots { display: flex; gap: 5px; }
+    .desk-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .d-r { background: #ff5f57; } .d-y { background: #febc2e; } .d-g { background: #28c840; }
+    .desk-url {
+      flex: 1; background: rgba(255,255,255,.08); border-radius: 16px;
+      padding: .25rem .8rem; font-family: 'DM Mono', monospace;
+      font-size: .7rem; color: rgba(255,255,255,.4);
+    }
+
+    .desk-body {
+      background: var(--paper);
+    }
+
+    .desk-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .8rem 2rem; background: var(--white);
+      border-bottom: 1px solid var(--border);
+    }
+    .desk-logo { font-family:'Playfair Display',serif; font-weight:900; font-size:1.1rem; }
+    .desk-links { display:flex; gap:1.5rem; }
+    .desk-link { width:40px; height:6px; border-radius:3px; background:var(--border); }
+    .desk-nav-cta { width:60px; height:22px; border-radius:3px; background:var(--ink); }
+
+    .desk-hero {
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:2rem; padding:2.5rem 2rem; align-items:center;
+    }
+    .dh-tag { width:50px; height:5px; background:var(--accent); border-radius:3px; margin-bottom:.6rem; }
+    .dh-h1 { height:16px; background:var(--ink); border-radius:3px; margin-bottom:.4rem; opacity:.12; }
+    .dh-h2 { height:16px; background:var(--ink); border-radius:3px; margin-bottom:.8rem; opacity:.08; width:70%; }
+    .dh-p { height:5px; background:var(--muted); border-radius:3px; margin-bottom:.3rem; opacity:.2; }
+    .dh-btns { display:flex; gap:.5rem; margin-top:.8rem; }
+    .dh-btn1 { height:20px; width:70px; border-radius:3px; background:var(--accent); opacity:.8; }
+    .dh-btn2 { height:20px; width:60px; border-radius:3px; border:1px solid var(--border); }
+    .dh-img { background:linear-gradient(135deg,var(--cream),rgba(200,80,42,.15)); border-radius:8px; height:130px; border:1px solid var(--border); }
+
+    .desk-cards-row {
+      display:grid; grid-template-columns:repeat(4,1fr);
+      gap:1rem; padding:0 2rem 2rem;
+    }
+    .desk-card {
+      background:var(--white); border:1px solid var(--border);
+      border-radius:6px; overflow:hidden;
+    }
+    .dc-img { height:55px; background:var(--cream); }
+    .dc-body { padding:.7rem; }
+    .dc-t { height:7px; border-radius:3px; background:var(--ink); opacity:.15; margin-bottom:.3rem; }
+    .dc-p { height:5px; border-radius:3px; background:var(--muted); opacity:.2; }
+
+    /* Mobile mockup */
+    .mobile-frame {
+      max-width: 280px; margin: 0 auto;
+      background: #1a1714; border-radius: 36px;
+      padding: 10px; box-shadow: 0 30px 80px rgba(0,0,0,.5);
+    }
+    .mobile-inner {
+      background: var(--paper); border-radius: 28px;
+      overflow: hidden;
+    }
+    .mob-status {
+      background: var(--white); display:flex; justify-content:space-between;
+      padding: .4rem .9rem; font-family:'DM Mono',monospace;
+      font-size:.6rem; color:var(--muted);
+    }
+    .mob-nav {
+      display:flex; justify-content:space-between; align-items:center;
+      padding: .6rem .9rem; background:var(--white);
+      border-bottom:1px solid var(--border);
+    }
+    .mob-logo { font-family:'Playfair Display',serif; font-weight:900; font-size:.9rem; }
+    .mob-ham { display:flex; flex-direction:column; gap:3px; }
+    .mob-ham span { width:18px; height:1.5px; background:var(--ink); }
+    .mob-hero { padding:1.2rem .9rem; background:var(--white); margin-bottom:.6rem; }
+    .mh-tag { width:40px; height:4px; background:var(--accent); border-radius:2px; margin-bottom:.5rem; }
+    .mh-h  { height:10px; border-radius:2px; background:var(--ink); opacity:.12; margin-bottom:.3rem; }
+    .mh-p  { height:4px; border-radius:2px; background:var(--muted); opacity:.2; margin-bottom:.2rem; }
+    .mh-btn { height:18px; width:80px; border-radius:3px; background:var(--accent); opacity:.8; margin-top:.6rem; }
+    .mob-cards { display:flex; flex-direction:column; gap:.5rem; padding:0 .9rem .9rem; }
+    .mob-card {
+      background:var(--white); border:1px solid var(--border);
+      border-radius:6px; display:flex; gap:.7rem; padding:.6rem;
+    }
+    .mc-img { width:44px; height:44px; border-radius:4px; background:var(--cream); flex-shrink:0; }
+    .mc-body { flex:1; }
+    .mc-t { height:6px; border-radius:2px; background:var(--ink); opacity:.15; margin-bottom:.3rem; }
+    .mc-p { height:4px; border-radius:2px; background:var(--muted); opacity:.2; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────── */
+    #responsive { background: var(--cream); }
+
+    .resp-features {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+
+    .resp-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.8rem;
+      transition: border-color .3s, transform .3s;
+    }
+    .resp-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+
+    .resp-icon {
+      width: 44px; height: 44px; border-radius: 8px;
+      background: var(--ink); display: flex; align-items: center;
+      justify-content: center; margin-bottom: 1.2rem;
+      font-size: 1.1rem;
+    }
+
+    .resp-title { font-weight: 700; margin-bottom: .5rem; font-size: 1rem; }
+    .resp-desc { font-size: .88rem; color: var(--muted); line-height: 1.6; }
+
+    /* Breakpoint diagram */
+    .bp-diagram {
+      display: flex; gap: 1rem; align-items: flex-end;
+      margin-top: 3rem; flex-wrap: wrap;
+    }
+    .bp-block {
+      flex: 1; min-width: 120px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 8px; padding: 1.2rem; text-align: center;
+      position: relative;
+    }
+    .bp-icon { font-size: 1.8rem; margin-bottom: .5rem; }
+    .bp-name { font-weight: 700; font-size: .9rem; margin-bottom: .2rem; }
+    .bp-range { font-family: 'DM Mono', monospace; font-size: .7rem; color: var(--muted); }
+    .bp-bar {
+      width: 100%; height: 4px; border-radius: 2px;
+      background: var(--accent); margin-top: .8rem; opacity: .6;
+    }
+    .bp-block:nth-child(1) .bp-bar { opacity: .25; }
+    .bp-block:nth-child(2) .bp-bar { opacity: .45; }
+    .bp-block:nth-child(3) .bp-bar { opacity: .65; }
+    .bp-block:nth-child(4) .bp-bar { opacity: .85; }
+
+    /* ─── FOOTER ─────────────────────────────────────── */
+    footer {
+      background: var(--ink); color: rgba(245,240,232,.6);
+      padding: 4rem clamp(1.5rem, 6vw, 5rem) 2rem;
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr;
+      gap: 3rem; margin-bottom: 3rem;
+    }
+    .footer-brand .nav-logo { color: var(--paper); }
+    .footer-brand p { font-size: .88rem; margin-top: .8rem; max-width: 32ch; line-height: 1.6; }
+    .footer-col h4 { color: var(--white); font-size: .8rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 1rem; }
+    .footer-col a { display: block; font-size: .88rem; text-decoration: none; color: rgba(245,240,232,.5); margin-bottom: .5rem; transition: color .2s; }
+    .footer-col a:hover { color: var(--gold); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 2rem; border-top: 1px solid rgba(255,255,255,.08);
+      font-size: .78rem;
+    }
+    .footer-bottom a { color: var(--gold); text-decoration: none; }
+
+    /* ─── SCROLL ANIMATION ───────────────────────────── */
+    .reveal {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ─── MOBILE RESPONSIVE ──────────────────────────── */
+    @media (max-width: 900px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .mood-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+      }
+      .mood-block { grid-column: auto !important; grid-row: auto !important; height: 100px; }
+    }
+
+    @media (max-width: 600px) {
+      .hero-stats { flex-wrap: wrap; gap: 1.2rem; }
+      .footer-bottom { flex-direction: column; gap: .8rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">Ne<span>x</span>us</a>
+  <ul class="nav-links">
+    <li><a href="#heuristics">Evaluation</a></li>
+    <li><a href="#moodboard">Moodboard</a></li>
+    <li><a href="#styleguide">Style Guide</a></li>
+    <li><a href="#mockups">Mockups</a></li>
+    <li><a href="#responsive">Responsive</a></li>
+  </ul>
+  <a href="#mockups" class="nav-cta">View Mockups</a>
+  <div class="hamburger" onclick="this.classList.toggle('open')">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid">
+    <div class="hero-text">
+      <div class="hero-eyebrow">UI/UX Redesign Project</div>
+      <h1>Design that <em>moves</em> people forward</h1>
+      <p class="hero-desc">
+        A complete website UI overhaul — from heuristic evaluation to high-fidelity mockups — engineered for clarity, usability, and visual delight.
+      </p>
+      <div class="hero-actions">
+        <a href="#mockups" class="btn-primary">Explore Mockups</a>
+        <a href="#heuristics" class="btn-ghost">See Evaluation</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">12</div>
+          <div class="stat-label">Issues Found</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">3</div>
+          <div class="stat-label">Breakpoints</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">5+</div>
+          <div class="stat-label">Components</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="mockup-card">
+        <div class="mockup-bar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <div class="url-bar">nexus-redesign.io/home</div>
+        </div>
+        <div class="mockup-body">
+          <div class="mock-nav-strip">
+            <div class="mock-pill" style="width:50px"></div>
+            <div class="mock-pill" style="width:36px"></div>
+            <div class="mock-pill" style="width:44px"></div>
+            <div class="mock-pill" style="width:40px;margin-left:auto;background:var(--ink);opacity:.15"></div>
+          </div>
+          <div class="mock-hero-block">
+            <div class="mock-tag"></div>
+            <div class="mock-h"></div>
+            <div class="mock-h" style="width:75%"></div>
+            <div class="mock-p"></div>
+            <div class="mock-p" style="width:80%"></div>
+            <div class="mock-btns">
+              <div class="mock-btn mock-btn-a"></div>
+              <div class="mock-btn mock-btn-b"></div>
+            </div>
+          </div>
+          <div class="mock-cards">
+            <div class="mock-card">
+              <div class="mock-card-img"></div>
+              <div class="mock-card-line"></div>
+              <div class="mock-card-line" style="width:70%"></div>
+            </div>
+            <div class="mock-card">
+              <div class="mock-card-img" style="background:rgba(200,80,42,.15)"></div>
+              <div class="mock-card-line"></div>
+              <div class="mock-card-line" style="width:60%"></div>
+            </div>
+            <div class="mock-card">
+              <div class="mock-card-img" style="background:rgba(201,168,76,.15)"></div>
+              <div class="mock-card-line"></div>
+              <div class="mock-card-line" style="width:80%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="badge-float">
+        <span class="big">Hi-Fi</span>
+        <span class="small">Mockup</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HEURISTIC EVALUATION -->
+<section id="heuristics">
+  <div class="section-label">Step 01</div>
+  <h2>Heuristic Evaluation</h2>
+  <p style="color:rgba(245,240,232,.55); max-width:55ch;">
+    Nielsen's 10 usability heuristics applied — surfacing friction points, inconsistencies, and accessibility gaps across the original interface.
+  </p>
+
+  <div class="issues-grid">
+    <div class="issue-card sev-high reveal">
+      <span class="issue-num">#01</span>
+      <div class="issue-sev sev-high">● High Severity</div>
+      <div class="issue-title">No Visible System Status</div>
+      <div class="issue-desc">Loading states, form submission feedback, and async actions lacked any indicator, leaving users uncertain whether their actions had any effect.</div>
+    </div>
+    <div class="issue-card sev-high reveal">
+      <span class="issue-num">#02</span>
+      <div class="issue-sev sev-high">● High Severity</div>
+      <div class="issue-title">Inconsistent Navigation Labels</div>
+      <div class="issue-desc">Menu items used different terminology across pages (e.g., "Account" vs "Profile" vs "My Settings"), violating the consistency heuristic.</div>
+    </div>
+    <div class="issue-card sev-med reveal">
+      <span class="issue-num">#03</span>
+      <div class="issue-sev sev-med">◐ Medium Severity</div>
+      <div class="issue-title">Poor Error Message Quality</div>
+      <div class="issue-desc">Generic "Something went wrong" errors gave users no context or recovery path, hindering error recovery and increasing support burden.</div>
+    </div>
+    <div class="issue-card sev-high reveal">
+      <span class="issue-num">#04</span>
+      <div class="issue-sev sev-high">● High Severity</div>
+      <div class="issue-title">Insufficient Colour Contrast</div>
+      <div class="issue-desc">Body text at 3.8:1 ratio failed WCAG AA. CTA buttons at 2.1:1 were below minimum thresholds, making them illegible for low-vision users.</div>
+    </div>
+    <div class="issue-card sev-med reveal">
+      <span class="issue-num">#05</span>
+      <div class="issue-sev sev-med">◐ Medium Severity</div>
+      <div class="issue-title">No Recognition Shortcuts</div>
+      <div class="issue-desc">Power users had no keyboard shortcuts, recent history, or quick-access patterns — forcing the same multi-click journeys on every return visit.</div>
+    </div>
+    <div class="issue-card sev-low reveal">
+      <span class="issue-num">#06</span>
+      <div class="issue-sev sev-low">○ Low Severity</div>
+      <div class="issue-title">Cluttered Visual Hierarchy</div>
+      <div class="issue-desc">Equal visual weight applied to primary and secondary content created cognitive overload. Users struggled to determine where to look first on landing pages.</div>
+    </div>
+  </div>
+</section>
+
+<!-- MOODBOARD -->
+<section id="moodboard">
+  <div class="section-label reveal">Step 02</div>
+  <h2 class="reveal">Mood Board</h2>
+  <p class="reveal" style="color:var(--muted); max-width:55ch;">
+    An editorial-meets-modern aesthetic — warm paper tones grounded by deep ink, punctuated with terracotta and gold accents for warmth and urgency.
+  </p>
+
+  <div class="mood-grid reveal">
+    <div class="mood-block m1">
+      <div class="mood-label">
+        <div style="font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:#fff;padding:1rem 1rem .4rem;line-height:1.1">Editorial<br><em>Weight</em></div>
+        <div style="padding:0 1rem 1rem;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.5)">Primary Ink — #0f0e0d</div>
+      </div>
+    </div>
+    <div class="mood-block m2">
+      <div class="mood-label">Terracotta Accent — #c8502a</div>
+    </div>
+    <div class="mood-block m3">
+      <div class="mood-label">Antique Gold — #c9a84c</div>
+    </div>
+    <div class="mood-block m4">
+      <div class="mood-label mood-label-light">Warm Cream — #ede7d9</div>
+    </div>
+    <div class="mood-block m5">
+      <div class="mood-label">Forest Teal — #3d6b60</div>
+    </div>
+    <div class="mood-block m6">
+      <div class="mood-label mood-label-light">
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-style:italic;margin-bottom:.2rem">Aa Bb Cc</div>
+        Playfair Display — Display
+      </div>
+    </div>
+    <div class="mood-block m7"></div>
+    <div class="mood-block m8">
+      <div class="mood-label" style="font-family:'DM Sans',sans-serif;font-size:.8rem;">DM Sans — Body Text</div>
+    </div>
+    <div class="mood-block m9"></div>
+    <div class="mood-block m10">
+      <div class="mood-label mood-label-light">Paper — #f5f0e8</div>
+    </div>
+  </div>
+</section>
+
+<!-- STYLE GUIDE -->
+<section id="styleguide">
+  <div class="section-label reveal">Step 03</div>
+  <h2 class="reveal">Style Guide</h2>
+  <p class="reveal" style="color:var(--muted); max-width:55ch;">
+    A living reference for colours, typography, spacing, and components — ensuring every screen speaks the same visual language.
+  </p>
+
+  <div class="sg-grid">
+    <!-- Colors -->
+    <div class="sg-block reveal">
+      <div class="sg-block-header">Colour Palette</div>
+      <div class="sg-block-body">
+        <div class="swatches">
+          <div class="swatch">
+            <div class="swatch-color" style="background:#0f0e0d"></div>
+            <div class="swatch-info"><div class="swatch-name">Ink</div><div class="swatch-hex">#0f0e0d</div></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:#c8502a"></div>
+            <div class="swatch-info"><div class="swatch-name">Accent</div><div class="swatch-hex">#c8502a</div></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:#c9a84c"></div>
+            <div class="swatch-info"><div class="swatch-name">Gold</div><div class="swatch-hex">#c9a84c</div></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:#f5f0e8;border:1px solid #d6cfc3"></div>
+            <div class="swatch-info"><div class="swatch-name">Paper</div><div class="swatch-hex">#f5f0e8</div></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:#7a7062"></div>
+            <div class="swatch-info"><div class="swatch-name">Muted</div><div class="swatch-hex">#7a7062</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Typography -->
+    <div class="sg-block reveal">
+      <div class="sg-block-header">Typography Scale</div>
+      <div class="sg-block-body">
+        <div class="type-row">
+          <div class="type-specimen" style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;line-height:1.1">Display H1</div>
+          <div class="type-meta">Playfair Display / 900 / 2rem</div>
+        </div>
+        <div class="type-row">
+          <div class="type-specimen" style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700">Section Heading</div>
+          <div class="type-meta">Playfair Display / 700 / 1.4rem</div>
+        </div>
+        <div class="type-row">
+          <div class="type-specimen" style="font-size:1rem">Body paragraph text that reads easily at comfortable sizes, using DM Sans for excellent legibility.</div>
+          <div class="type-meta">DM Sans / 400 / 1rem / 1.65 leading</div>
+        </div>
+        <div class="type-row">
+          <div class="type-specimen" style="font-family:'DM Mono',monospace;font-size:.82rem;color:var(--accent)">code & labels</div>
+          <div class="type-meta">DM Mono / 400 / 0.82rem</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spacing -->
+    <div class="sg-block reveal">
+      <div class="sg-block-header">Spacing System (4pt base)</div>
+      <div class="sg-block-body">
+        <div class="spacing-row"><div class="sp-bar" style="width:4px"></div><div class="sp-label">4px — xs</div></div>
+        <div class="spacing-row"><div class="sp-bar" style="width:8px"></div><div class="sp-label">8px — sm</div></div>
+        <div class="spacing-row"><div class="sp-bar" style="width:16px"></div><div class="sp-label">16px — md</div></div>
+        <div class="spacing-row"><div class="sp-bar" style="width:24px"></div><div class="sp-label">24px — lg</div></div>
+        <div class="spacing-row"><div class="sp-bar" style="width:32px"></div><div class="sp-label">32px — xl</div></div>
+        <div class="spacing-row"><div class="sp-bar" style="width:48px"></div><div class="sp-label">48px — 2xl</div></div>
+        <div class="spacing-row"><div class="sp-bar" style="width:64px"></div><div class="sp-label">64px — 3xl</div></div>
+        <div class="spacing-row"><div class="sp-bar" style="width:96px"></div><div class="sp-label">96px — section</div></div>
+      </div>
+    </div>
+
+    <!-- Components -->
+    <div class="sg-block reveal">
+      <div class="sg-block-header">Component Library</div>
+      <div class="sg-block-body">
+        <div class="comp-row">
+          <div class="comp-label">Buttons</div>
+          <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+            <button class="btn-primary" style="font-size:.82rem;padding:.55rem 1.2rem">Primary</button>
+            <button class="btn-ghost" style="font-size:.82rem;padding:.55rem 1.2rem">Ghost</button>
+            <button style="background:var(--gold);color:var(--ink);border:none;border-radius:4px;padding:.55rem 1.2rem;font-size:.82rem;font-weight:600;cursor:pointer">Gold</button>
+          </div>
+        </div>
+        <div class="comp-row">
+          <div class="comp-label">Badges</div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <span style="background:rgba(200,80,42,.12);color:var(--accent);padding:.2rem .7rem;border-radius:20px;font-size:.72rem;font-weight:600">New</span>
+            <span style="background:rgba(201,168,76,.15);color:#8a6f20;padding:.2rem .7rem;border-radius:20px;font-size:.72rem;font-weight:600">Featured</span>
+            <span style="background:var(--cream);color:var(--muted);padding:.2rem .7rem;border-radius:20px;font-size:.72rem;font-weight:600;border:1px solid var(--border)">Default</span>
+          </div>
+        </div>
+        <div class="comp-row">
+          <div class="comp-label">Input Fields</div>
+          <input type="text" placeholder="Search or type..." style="width:100%;padding:.55rem .9rem;border:1.5px solid var(--border);border-radius:4px;font-family:'DM Sans',sans-serif;font-size:.88rem;background:var(--white);color:var(--ink);outline:none;transition:border-color .2s" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'"/>
+        </div>
+        <div class="comp-row" style="border:none">
+          <div class="comp-label">Divider</div>
+          <hr style="border:none;border-top:1px solid var(--border)"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MOCKUPS -->
+<section id="mockups">
+  <div class="section-label">Step 04</div>
+  <h2>High-Fidelity Mockups</h2>
+  <p style="color:rgba(245,240,232,.55); max-width:55ch;">
+    Production-ready screen designs demonstrating visual hierarchy, layout structure, and interaction patterns across device contexts.
+  </p>
+
+  <div class="mockup-tabs">
+    <button class="tab-btn active" onclick="switchTab('desktop', this)">🖥 Desktop</button>
+    <button class="tab-btn" onclick="switchTab('mobile', this)">📱 Mobile</button>
+  </div>
+
+  <!-- Desktop Mockup -->
+  <div class="mockup-frame active" id="tab-desktop">
+    <div class="desk-chrome">
+      <div class="desk-dots">
+        <div class="desk-dot d-r"></div>
+        <div class="desk-dot d-y"></div>
+        <div class="desk-dot d-g"></div>
+      </div>
+      <div class="desk-url">nexus-redesign.io — Home Page</div>
+    </div>
+    <div class="desk-body">
+      <div class="desk-nav">
+        <div class="desk-logo">Ne<span style="color:var(--accent)">x</span>us</div>
+        <div class="desk-links">
+          <div class="desk-link"></div>
+          <div class="desk-link"></div>
+          <div class="desk-link"></div>
+          <div class="desk-link"></div>
+        </div>
+        <div class="desk-nav-cta"></div>
+      </div>
+      <div class="desk-hero">
+        <div>
+          <div class="dh-tag"></div>
+          <div class="dh-h1"></div>
+          <div class="dh-h2"></div>
+          <div class="dh-p"></div>
+          <div class="dh-p" style="width:85%"></div>
+          <div class="dh-p" style="width:60%"></div>
+          <div class="dh-btns">
+            <div class="dh-btn1"></div>
+            <div class="dh-btn2"></div>
+          </div>
+          <div style="display:flex;gap:1.5rem;margin-top:1rem">
+            <div style="border-left:2px solid var(--accent);padding-left:.6rem">
+              <div style="height:10px;width:20px;background:var(--ink);border-radius:2px;opacity:.2;margin-bottom:.2rem"></div>
+              <div style="height:5px;width:30px;background:var(--muted);border-radius:2px;opacity:.2"></div>
+            </div>
+            <div style="border-left:2px solid var(--accent);padding-left:.6rem">
+              <div style="height:10px;width:20px;background:var(--ink);border-radius:2px;opacity:.2;margin-bottom:.2rem"></div>
+              <div style="height:5px;width:30px;background:var(--muted);border-radius:2px;opacity:.2"></div>
+            </div>
+            <div style="border-left:2px solid var(--accent);padding-left:.6rem">
+              <div style="height:10px;width:20px;background:var(--ink);border-radius:2px;opacity:.2;margin-bottom:.2rem"></div>
+              <div style="height:5px;width:30px;background:var(--muted);border-radius:2px;opacity:.2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="dh-img"></div>
+      </div>
+      <div style="padding:.4rem 2rem .8rem;display:flex;gap:.6rem">
+        <div style="height:4px;width:60px;border-radius:2px;background:var(--muted);opacity:.2"></div>
+        <div style="height:4px;width:40px;border-radius:2px;background:var(--muted);opacity:.1"></div>
+      </div>
+      <div class="desk-cards-row">
+        <div class="desk-card"><div class="dc-img"></div><div class="dc-body"><div class="dc-t"></div><div class="dc-p"></div></div></div>
+        <div class="desk-card"><div class="dc-img" style="background:rgba(200,80,42,.1)"></div><div class="dc-body"><div class="dc-t"></div><div class="dc-p"></div></div></div>
+        <div class="desk-card"><div class="dc-img" style="background:rgba(201,168,76,.1)"></div><div class="dc-body"><div class="dc-t"></div><div class="dc-p"></div></div></div>
+        <div class="desk-card"><div class="dc-img" style="background:rgba(61,107,96,.1)"></div><div class="dc-body"><div class="dc-t"></div><div class="dc-p"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Mockup -->
+  <div class="mockup-frame" id="tab-mobile">
+    <div class="mobile-frame">
+      <div class="mobile-inner">
+        <div class="mob-status">
+          <span>9:41</span><span>●●●</span>
+        </div>
+        <div class="mob-nav">
+          <div class="mob-logo">Ne<span style="color:var(--accent)">x</span>us</div>
+          <div class="mob-ham"><span></span><span></span><span></span></div>
+        </div>
+        <div class="mob-hero">
+          <div class="mh-tag"></div>
+          <div class="mh-h"></div>
+          <div class="mh-h" style="width:80%"></div>
+          <div class="mh-p"></div>
+          <div class="mh-p" style="width:75%"></div>
+          <div class="mh-btn"></div>
+        </div>
+        <div class="mob-cards">
+          <div class="mob-card">
+            <div class="mc-img"></div>
+            <div class="mc-body"><div class="mc-t"></div><div class="mc-p"></div><div class="mc-p" style="width:60%"></div></div>
+          </div>
+          <div class="mob-card">
+            <div class="mc-img" style="background:rgba(200,80,42,.15)"></div>
+            <div class="mc-body"><div class="mc-t"></div><div class="mc-p"></div><div class="mc-p" style="width:70%"></div></div>
+          </div>
+          <div class="mob-card">
+            <div class="mc-img" style="background:rgba(201,168,76,.15)"></div>
+            <div class="mc-body"><div class="mc-t"></div><div class="mc-p"></div><div class="mc-p" style="width:80%"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESPONSIVE -->
+<section id="responsive">
+  <div class="section-label reveal">Step 05</div>
+  <h2 class="reveal">Responsive Design</h2>
+  <p class="reveal" style="color:var(--muted); max-width:55ch;">
+    Every layout adapts fluidly across breakpoints using CSS Grid, custom properties, and fluid type scales — no device left behind.
+  </p>
+
+  <div class="bp-diagram reveal">
+    <div class="bp-block">
+      <div class="bp-icon">📱</div>
+      <div class="bp-name">Mobile</div>
+      <div class="bp-range">320px – 599px</div>
+      <div class="bp-bar"></div>
+    </div>
+    <div class="bp-block">
+      <div class="bp-icon">📟</div>
+      <div class="bp-name">Tablet</div>
+      <div class="bp-range">600px – 899px</div>
+      <div class="bp-bar"></div>
+    </div>
+    <div class="bp-block">
+      <div class="bp-icon">💻</div>
+      <div class="bp-name">Laptop</div>
+      <div class="bp-range">900px – 1279px</div>
+      <div class="bp-bar"></div>
+    </div>
+    <div class="bp-block">
+      <div class="bp-icon">🖥</div>
+      <div class="bp-name">Desktop</div>
+      <div class="bp-range">1280px+</div>
+      <div class="bp-bar"></div>
+    </div>
+  </div>
+
+  <div class="resp-features">
+    <div class="resp-card reveal">
+      <div class="resp-icon">⚡</div>
+      <div class="resp-title">Fluid Typography</div>
+      <div class="resp-desc">Type scales via <code style="font-family:'DM Mono',monospace;font-size:.82em;color:var(--accent)">clamp()</code> eliminate breakpoint jumps. Headings and body text resize smoothly across any viewport width.</div>
+    </div>
+    <div class="resp-card reveal">
+      <div class="resp-icon" style="background:var(--accent)">⊞</div>
+      <div class="resp-title">Adaptive Grid Layouts</div>
+      <div class="resp-desc">CSS Grid with <code style="font-family:'DM Mono',monospace;font-size:.82em;color:var(--accent)">auto-fit</code> collapses multi-column grids to single-column on narrow viewports without JavaScript.</div>
+    </div>
+    <div class="resp-card reveal">
+      <div class="resp-icon" style="background:var(--gold)">🔍</div>
+      <div class="resp-title">Touch-First Interactions</div>
+      <div class="resp-desc">44×44px minimum tap targets, swipe-friendly carousels, and a collapsible hamburger nav ensure smooth mobile UX.</div>
+    </div>
+    <div class="resp-card reveal">
+      <div class="resp-icon" style="background:#3d6b60">♿</div>
+      <div class="resp-title">Accessibility Baked In</div>
+      <div class="resp-desc">WCAG AA contrast ratios, semantic HTML, focus-visible indicators, and ARIA labels ensure the redesign is usable by all.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo">Ne<span>x</span>us</a>
+      <p>A UI/UX redesign case study exploring visual hierarchy, responsive layouts, and interaction design.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Sections</h4>
+      <a href="#heuristics">Heuristic Eval</a>
+      <a href="#moodboard">Mood Board</a>
+      <a href="#styleguide">Style Guide</a>
+      <a href="#mockups">Mockups</a>
+      <a href="#responsive">Responsive</a>
+    </div>
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <a href="#">Download PDF</a>
+      <a href="#">Component Figma</a>
+      <a href="#">Design Tokens</a>
+      <a href="#">WCAG Checklist</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Nexus UI Redesign Project</span>
+    <span>Built with intentional design · <a href="#">View Source</a></span>
+  </div>
+</footer>
+
+<script>
+  // Tab switching
+  function switchTab(name, btn) {
+    document.querySelectorAll('.mockup-frame').forEach(f => f.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        entry.target.style.transitionDelay = (i % 4) * 80 + 'ms';
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
